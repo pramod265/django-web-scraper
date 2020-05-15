@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 
+from scraper.mixin import get_websites_data, scrape_url
 from scraper.models import SiteData
 from scraper.serializers import SiteDataSerializer
 
@@ -12,28 +13,40 @@ from scraper.serializers import SiteDataSerializer
 class ScrapeSitesViewSet(viewsets.ModelViewSet):
     queryset = SiteData.objects.all()
     serializer_class = SiteDataSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        page = requests.get('https://www.worldometers.info/coronavirus/#countries')
-        soup = BeautifulSoup(page.content, 'html.parser')
+        data = request.data
 
-        # print(soup)
-        data = []
-        table = soup.find('table', attrs={'class': 'main_table_countries'})
-        table_body = table.find('tbody')
+        threshold = data.get('threshold', 10) # default 10
+        url = data.get('url', None)
 
-        rows = table_body.find_all('tr')
+        if url:
+            data = scrape_url(url)
+            SiteData.objects.create(
+                url=url,
+                data=data
+            )
 
-        # total = table_body.find_all('tr', attrs={'class':'total_row'})
-        # total = [ele.text.strip() for ele in total]
+        else:
+            page, temp = 1, 0
+            while True:
 
-        th = table.find_all('th')
-        th = [ele.text.strip() for ele in th]
+                if threshold >= 20:
+                    threshold -= 20
+                    temp = 20
+                elif 0 < threshold < 20:
+                    temp = threshold
+                    threshold = 0
+                else:
+                    break
 
-        for row in rows:
-            cols = row.find_all('td')
-            cols = [ele.text.strip() for ele in cols]
-            data.append([ele for ele in cols])
+                data = get_websites_data(threshold=temp, page=page)
+                model_objects = [SiteData(url=i["url"],category=i["category"],city=i["city"],data=i["data"]) for i in data]
+                SiteData.objects.bulk_create(model_objects)
 
-        return Response(status=status.HTTP_201_CREATED)
+                page += 1
+                # temp = threshold
+
+
+        return Response(data, status=status.HTTP_201_CREATED)

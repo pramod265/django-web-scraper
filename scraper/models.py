@@ -4,8 +4,11 @@ import jsonfield
 # Create your models here.
 
 class SiteData(models.Model):
-    data = jsonfield.JSONField(blank=True, default=dict())
     url = models.URLField(blank=True, null=True)
+    category = models.CharField(max_length=50, blank=True, null=True)
+    city = models.CharField(max_length=50, blank=True, null=True)
+    data = jsonfield.JSONField(blank=True, default=dict())
+    # data2 = models.TextField(blank=True, null=True) # TextField Do not process \n
     added_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
