@@ -25,7 +25,7 @@ SECRET_KEY = '+oqo!18h@d90!l)q8p#*7_xh+^c)#kgd9v(725dmwms@6u5daf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', '0.0.0.0', 'localhost']
+ALLOWED_HOSTS = ['*', '0.0.0.0', 'localhost', 'django-web-scraper']
 
 
 # Application definition
