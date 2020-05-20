@@ -1,2 +1,2 @@
 *.rb linguist-language=Python
-static/* linguist-vendored
+staticfiles/* linguist-vendored
