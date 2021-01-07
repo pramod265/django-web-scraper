@@ -24,7 +24,7 @@ idna==2.9
 incremental==17.5.0
 itypes==1.2.0
 Jinja2==2.11.2
-lxml==4.5.0
+lxml==4.6.2
 MarkupSafe==1.1.1
 oauth2-provider==0.0
 oauthlib==3.1.0
